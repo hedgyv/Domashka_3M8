@@ -2,49 +2,86 @@ from datetime import datetime, timedelta
 current_datetime = datetime.now()
 print(current_datetime.date())
 users = [
-    {'Sergey':datetime(year=1980, month=8, day=15)},
-    {'Oleg':datetime(year=1983, month=8, day=15)},
-    {'Yaroslav':datetime(year=1985, month=8, day=13)},
-    {'Volodymyr':datetime(year=1958, month=8, day=22)}
+    {'name':'Sergey','bday': datetime(year=1980, month=8, day=15)},
+    {'name':'Oleg','bday':datetime(year=1983, month=9, day=1)},
+    {'name':'Yaroslav','bday':datetime(year=1985, month=8, day=13)},
+    {'name':'Volodymyr','bday':datetime(year=1958, month=8, day=22)}
 ]
 
-days_with_b_users = list()
-days_with_b_users_after_week = list()
-days_with_b_users_on_holiday = list()
+day_bday = {
+    "Monday": [],
+    "Tuesday": [],
+    "Wednesday": [],
+    "Thursday": [],
+    "Friday": []
+    }
 
 #print(users)
 
 
 def get_birthdays_per_week(users):
-    one_week_interval = timedelta(weeks=1)
-    one_week_date_further = current_datetime.date() + one_week_interval
-    print(one_week_date_further)
+    for user in users:
+        if current_datetime.month == user['bday'].month:
+            if user['bday'].day <= current_datetime.day + 7 and user['bday'].day >= current_datetime.day:
+                #user's this year bday option
+                current_bday = datetime(year = current_datetime.year, month = user['bday'].month, day = user['bday'].day)
+                print(current_bday)
+                #define weekday of bday
+                wday = current_bday.strftime('%A') if current_bday.strftime('%A') not in ('Sunday' ,'Saturday') else 'Monday'
+                #print(wday)
+                day_bday[wday].append(user['name'])
+        if user['bday'].month - current_datetime.month == 1:
+            bday_next_month =  datetime(year = current_datetime.year, month = user['bday'].month, day = user['bday'].day)
+            curr_date_prev_month =  datetime(year = current_datetime.year, month = current_datetime.month, day = current_datetime.day)
+            print(bday_next_month)
+            print(curr_date_prev_month)
+            diff = bday_next_month - curr_date_prev_month
+            print(type(diff))
+            
+            if user['bday'].day <= (current_datetime + timedelta(days=7)).day and diff.days <= 7:
+                
+                wday = bday_next_month.strftime('%A') if bday_next_month.strftime('%A') not in ('Sunday' ,'Saturday') else 'Monday'
+                #print(wday)
+                day_bday[wday].append(user['name'])
+        #user['bday'].month == 1        
+        if user['bday'].year - current_datetime.year == 1:
+            bday_month_jan =  datetime(year = current_datetime.year + 1, month = user['bday'].month, day = user['bday'].day)
+            curr_date_prev_year =  datetime(year = current_datetime.year, month = current_datetime.month, day = current_datetime.day)
+            diff = bday_month_jan - curr_date_prev_year
 
-    for i in users:
-        for key, value in i.items():
-            if value.month == one_week_date_further.month and value.day == one_week_date_further.day:
-                #при условии, что неделя вперед не выпадает на следующий год year=current_datetime.year
-                value = datetime(year=current_datetime.year, month=value.month, day=value.day)
-                #print(f'{key} has a B-DAY at {value.strftime("%d %B")}')
-                days_with_b_users_after_week.append(key)
-                print('B-Day mentioned before one week')
-                print(f'{value.strftime("%A")}: {days_with_b_users_after_week}')
-            if current_datetime.month == value.month and current_datetime.day == value.day:
-                value = datetime(year=current_datetime.year, month=current_datetime.month, day=current_datetime.day)
-                if value.weekday() != 5 or value.weekday() != 6: 
-                    days_with_b_users.append(key)
-                    print('Happy B-Day!')
-                    print(f'{value.strftime("%A")}: {days_with_b_users}')
-                    
-                    #print(days_with_b_users)
-            #проблема с логикой, когда поздравить надо в понедельник тех, у кого др в субботу или воскресенье        
-            else:
-                if (current_datetime.day - value.day) == 1 or (current_datetime.day - value.day) == 2 and current_datetime.weekday() != 1:
-                    #при условии, что неделя вперед не выпадает на следующий год year=current_datetime.year
-                    value = datetime(year=current_datetime.year, month=current_datetime.month, day=current_datetime.day)
-                    #print(value.weekday())
-                    days_with_b_users_on_holiday.append(key)
-                    print('B-Day was on holidays')
-                    print(f'{value.strftime("%A")}: {days_with_b_users_on_holiday}')
+            if user['bday'].day <= (current_datetime + timedelta(days=7)).day and diff.days <= 7:
+                wday = bday_next_month.strftime('%A') if bday_next_month.strftime('%A') not in ('Sunday' ,'Saturday') else 'Monday'
+                #print(wday)
+                day_bday[wday].append(user['name'])
+
+    #print the day and name(names)
+    for day, names in day_bday.items():
+        if names:
+            print(f"{day}: {', '.join(names)}")
+    
+    
+    
+    #       #при условии, что неделя вперед не выпадает на следующий год year=current_datetime.year
+    #       value = datetime(year=current_datetime.year, month=value.month, day=value.day)
+    #       #print(f'{key} has a B-DAY at {value.strftime("%d %B")}')
+    #       days_with_b_users_after_week.append(key)
+    #       print('B-Day mentioned before one week')
+    #       print(f'{value.strftime("%A")}: {days_with_b_users_after_week}')
+    #   if current_datetime.month == value.month and current_datetime.day == value.day:
+    #       value = datetime(year=current_datetime.year, month=current_datetime.month, day=current_datetime.day)
+    #       if value.weekday() != 5 or value.weekday() != 6: 
+    #           days_with_b_users.append(key)
+    #           print('Happy B-Day!')
+    #           print(f'{value.strftime("%A")}: {days_with_b_users}'       
+    #           #print(days_with_b_users)
+    #   #проблема с логикой, когда поздравить надо в понедельник тех, у кого др в субботу или воскресенье        
+    #   else:
+    #       if (current_datetime.day - value.day) == 1 or (current_datetime.day - value.day) == 2 and current_datetime.weekday() != 1:
+    #           #при условии, что неделя вперед не выпадает на следующий год year=current_datetime.year
+    #           value = datetime(year=current_datetime.year, month=current_datetime.month, day=current_datetime.day)
+    #           #print(value.weekday())
+    #           days_with_b_users_on_holiday.append(key)
+    #           print('B-Day was on holidays')
+    #           print(f'{value.strftime("%A")}: {days_with_b_users_on_holiday}')
             
 get_birthdays_per_week(users)
